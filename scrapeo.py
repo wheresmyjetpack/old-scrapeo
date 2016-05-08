@@ -1,4 +1,3 @@
-
 import urllib2
 import requests
 import sys
@@ -8,9 +7,11 @@ from bs4 import BeautifulSoup
 
 
 @click.command()
-@click.option('--url')
+@click.option('--url',
+        help='URL for scrapeo to scrape')
 def cli(url):
-    """ Scrap data from webpages that are useful for SEO purposes """
+    """ Scrape data from webpages that are useful for SEO purposes """
+
     try:
         req = requests.get(url)
 
