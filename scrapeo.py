@@ -1,6 +1,4 @@
-import urllib2
 import requests
-import sys
 import click
 
 from bs4 import BeautifulSoup
@@ -10,14 +8,14 @@ from bs4 import BeautifulSoup
 @click.option('--title', is_flag='true',
         help='Tell scrapeo to print the title of the document.'
         )
-@click.option('--description', is_flag='true',
-        help='Tell scrapeo to print the meta description of the document.'
+@click.option('--meta', default='description',
+        help='Tell scrapeo to print content from meta tags in the document.'
         )
 @click.option('--h1', is_flag='true',
         help='Tell scrapeo to print the text node for all h1\'s in the document'
         )
 @click.argument('url')
-def cli(title, description, h1, url):
+def cli(title, meta, h1, url):
     """ Scrape data from a document found at URL for SEO data analysis """
 
     try:
@@ -38,14 +36,14 @@ def cli(title, description, h1, url):
             except AttributeError:
                 click.echo('Document contains no title tag')
 
-        if description:
-            _description = soup.find('meta', { 'name': 'description' })
+        if meta:
+            _meta = soup.find('meta', { 'name': meta })
 
             try:
-                _description_out = 'Description: %s' % _description['content'].encode('utf-8')
-                click.echo(_description_out)
+                _meta_out = 'Meta %s: %s' % (meta, _meta['content'].encode('utf-8'))
+                click.echo(_meta_out)
             except TypeError:
-                click.echo('Document contains no meta description')
+                click.echo('Document contains no meta tag with name %s' % meta)
 
         if h1:
             _h1s = soup.find_all('h1')
