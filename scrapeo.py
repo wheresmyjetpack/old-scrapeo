@@ -1,8 +1,40 @@
 import requests
 import click
+import sys
 
 from bs4 import BeautifulSoup
 
+def opts_exist(*args):
+    return any(args)
+
+def scrape_title(soup):
+    try:
+        _title = soup.title.text.encode('utf-8').strip()
+        _title_out = 'Title: %s' % _title
+        click.echo(_title_out)
+
+    except AttributeError:
+        click.echo('Document contains no title tag')
+
+def scrape_meta(soup, name):
+    _meta = soup.find_all('meta', { 'name': name })
+
+    try:
+        for i in _meta:
+            _meta_out = 'Meta %s: %s' % (name, i['content'].encode('utf-8').strip())
+            click.echo(_meta_out)
+
+    except TypeError:
+        click.echo('Document contains no meta tag with name %s' % meta)
+
+def scrape_h1s(soup):
+    _h1s = soup.find_all('h1')
+    click.echo('h1\'s:')
+    count = 1
+
+    for _h1 in _h1s:
+        click.echo('%s.) %s' % (count, _h1.text.encode('utf-8').strip()))
+        count += 1
 
 @click.command()
 @click.option('--title', '-t', is_flag='true',
@@ -20,37 +52,26 @@ def cli(title, meta, h1, url):
 
         # Raise an excpetion if request returns "bad" status
         req.raise_for_status()
-
         html = req.text
         soup = BeautifulSoup(html, 'html.parser')
 
+        # Run without options provided (default behavior)
+        if not opts_exist(title, meta, h1):
+            scrape_title(soup)
+            scrape_meta(soup, 'description')
+            sys.exit(0)
+
         # Flags
         if title:
-            try:
-                _title = soup.title.text.encode('utf-8')
-                _title_out = 'Title: %s' % _title
-                click.echo(_title_out)
-            except AttributeError:
-                click.echo('Document contains no title tag')
+            scrape_title(soup)
 
         if meta:
-            _meta = soup.find_all('meta', { 'name': meta })
-
-            try:
-                for i in _meta:
-                    _meta_out = 'Meta %s: %s' % (meta, i['content'].encode('utf-8'))
-                    click.echo(_meta_out)
-            except TypeError:
-                click.echo('Document contains no meta tag with name %s' % meta)
+            scrape_meta(soup, meta)
 
         if h1:
-            _h1s = soup.find_all('h1')
-            click.echo('h1\'s:')
-            count = 1
-            for _h1 in _h1s:
-                click.echo('%s.) %s' % (count, _h1.text.encode('utf-8').strip()))
-                count += 1
+            scrape_h1s(soup)
 
     except requests.exceptions.RequestException, e:
+        # "Bad" status codes, improper input
         for arg in e.args:
             print arg
