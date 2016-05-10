@@ -25,7 +25,7 @@ def scrape_meta(soup, name):
             click.echo(_meta_out)
 
     except TypeError:
-        click.echo('Document contains no meta tag with name %s' % meta)
+        click.echo('Document contains no meta tag with name %s' % name)
 
 def scrape_h1s(soup):
     _h1s = soup.find_all('h1')
