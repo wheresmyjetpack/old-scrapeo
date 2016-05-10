@@ -5,15 +5,12 @@ from bs4 import BeautifulSoup
 
 
 @click.command()
-@click.option('--title', is_flag='true',
-        help='Tell scrapeo to print the title of the document.'
-        )
-@click.option('--meta', default='description',
-        help='Tell scrapeo to print content from meta tags in the document.'
-        )
+@click.option('--title', '-t', is_flag='true',
+        help='Tell scrapeo to print the title of the document.')
+@click.option('--meta', '-m',
+        help='Search meta tags by name and print their content')
 @click.option('--h1', is_flag='true',
-        help='Tell scrapeo to print the text node for all h1\'s in the document'
-        )
+        help='Tell scrapeo to print the text node for all h1\'s in the document')
 @click.argument('url')
 def cli(title, meta, h1, url):
     """ Scrape data from a document found at URL for SEO data analysis """
@@ -37,19 +34,22 @@ def cli(title, meta, h1, url):
                 click.echo('Document contains no title tag')
 
         if meta:
-            _meta = soup.find('meta', { 'name': meta })
+            _meta = soup.find_all('meta', { 'name': meta })
 
             try:
-                _meta_out = 'Meta %s: %s' % (meta, _meta['content'].encode('utf-8'))
-                click.echo(_meta_out)
+                for i in _meta:
+                    _meta_out = 'Meta %s: %s' % (meta, i['content'].encode('utf-8'))
+                    click.echo(_meta_out)
             except TypeError:
                 click.echo('Document contains no meta tag with name %s' % meta)
 
         if h1:
             _h1s = soup.find_all('h1')
             click.echo('h1\'s:')
+            count = 1
             for _h1 in _h1s:
-                click.echo(_h1.text.encode('utf-8').strip())
+                click.echo('%s.) %s' % (count, _h1.text.encode('utf-8').strip()))
+                count += 1
 
     except requests.exceptions.RequestException, e:
         for arg in e.args:
