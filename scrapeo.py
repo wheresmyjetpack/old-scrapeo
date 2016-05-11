@@ -4,11 +4,8 @@ import sys
 
 from bs4 import BeautifulSoup
 
-def opts_exist(*args):
+def opts_provided(*args):
     return any(args)
-
-def contains_schema(url):
-    return url[:7] == 'http://' or url[:8] == 'https://'
 
 def scrape_title(soup):
     try:
@@ -50,20 +47,21 @@ def scrape_h1s(soup):
 def cli(title, meta, h1, url):
     """ Scrape data from a document found at URL for SEO data analysis """
 
-    if not contains_schema(url):
+    # Rebuild URL if schema is not provided
+    if not url[:7] == 'http://' or url[:8] == 'https://':
         url = 'http://%s' % url
         click.echo('Rebuilt url to %s...' % url)
 
     try:
         req = requests.get(url)
 
-        # Raise an excpetion if request returns "bad" status
+        # Raise an exception if request returns "bad" status
         req.raise_for_status()
         html = req.text
         soup = BeautifulSoup(html, 'html.parser')
 
         # Run without options provided (default behavior)
-        if not opts_exist(title, meta, h1):
+        if not opts_provided(title, meta, h1):
             scrape_title(soup)
             scrape_meta(soup, 'description')
             sys.exit(0)
@@ -72,11 +70,12 @@ def cli(title, meta, h1, url):
         if title:
             scrape_title(soup)
 
-        if meta:
-            scrape_meta(soup, meta)
-
         if h1:
             scrape_h1s(soup)
+
+        # Options w/ args
+        if meta:
+            scrape_meta(soup, meta)
 
     except requests.exceptions.RequestException, e:
         # "Bad" status codes, improper input
