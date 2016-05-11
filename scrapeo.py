@@ -7,6 +7,9 @@ from bs4 import BeautifulSoup
 def opts_exist(*args):
     return any(args)
 
+def contains_schema(url):
+    return url[:7] == 'http://' or url[:8] == 'https://'
+
 def scrape_title(soup):
     try:
         _title = soup.title.text.encode('utf-8').strip()
@@ -19,13 +22,13 @@ def scrape_title(soup):
 def scrape_meta(soup, name):
     _meta = soup.find_all('meta', { 'name': name })
 
-    try:
+    if any(_meta):
         for i in _meta:
             _meta_out = 'Meta %s: %s' % (name, i['content'].encode('utf-8').strip())
             click.echo(_meta_out)
 
-    except TypeError:
-        click.echo('Document contains no meta tag with name %s' % name)
+    else:
+        click.echo('Document contains no meta tags by the name "%s"' % name)
 
 def scrape_h1s(soup):
     _h1s = soup.find_all('h1')
@@ -46,6 +49,10 @@ def scrape_h1s(soup):
 @click.argument('url')
 def cli(title, meta, h1, url):
     """ Scrape data from a document found at URL for SEO data analysis """
+
+    if not contains_schema(url):
+        url = 'http://%s' % url
+        click.echo('Rebuilt url to %s...' % url)
 
     try:
         req = requests.get(url)
