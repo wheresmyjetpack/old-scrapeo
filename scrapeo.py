@@ -48,7 +48,7 @@ def cli(title, meta, h1, url):
     """ Scrape data from a document found at URL for SEO data analysis """
 
     # Rebuild URL if schema is not provided
-    if not url[:7] == 'http://' or url[:8] == 'https://':
+    if not (url[:7] == 'http://' or url[:8] == 'https://'):
         url = 'http://%s' % url
         click.echo('Rebuilt url to %s...' % url)
 
