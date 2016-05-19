@@ -1,5 +1,0 @@
-#!/bin/sh
-
-mkdir -p $HOME/.virtualenvs && virtualenv $HOME/.virtualenvs/scrapeo
-source $HOME/.virtualenvs/scrapeo/bin/activate
-pip install .
