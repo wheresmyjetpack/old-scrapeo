@@ -16,16 +16,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 import requests
 import click
 import sys
 
+""" Local imports """
 from scrapeo.core import ScrapEO
-
-
-def opts_provided(*args):
-    return any(args)
+from scrapeo.utils import opts_provided
 
 @click.command()
 @click.option('--title', '-t', is_flag='true',
@@ -35,7 +32,7 @@ def opts_provided(*args):
 @click.option('--h1', is_flag='true',
         help='Tell scrapeo to print the text node for all h1\'s in the document')
 @click.argument('url')
-def cli(title, meta, h1, url):
+def cli(title, h1, meta, url):
     """ Scrape data from a document found at URL for SEO data analysis """
 
     # Rebuild URL if schema is not provided
@@ -53,7 +50,6 @@ def cli(title, meta, h1, url):
 
         # Run without options provided (default behavior)
         if not opts_provided(title, meta, h1):
-            print 'NO OPTS'
             click.echo('Title: %s' % scrapeo.scrape_title())
             click.echo('Meta description %s' % scrapeo.scrape_meta('description'))
             sys.exit(0)
@@ -72,7 +68,7 @@ def cli(title, meta, h1, url):
 
         # Options w/ args
         if meta:
-            scrape_meta(soup, meta)
+            click.echo(scrapeo.scrape_meta(meta))
 
     except requests.exceptions.RequestException, e:
         # "Bad" status codes, improper input

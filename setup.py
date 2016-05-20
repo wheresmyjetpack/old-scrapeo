@@ -1,8 +1,8 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='Scrap-EO',
-    version= '1.0',
+    version= '1.1',
     packages = find_packages(),
     install_requires=[
         'Click',

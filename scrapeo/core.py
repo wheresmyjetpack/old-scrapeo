@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 class ScrapEO(object):
 
     def __init__(self, html):
-        self.soup = BeautifulSoup(html)
+        self.soup = BeautifulSoup(html, 'html.parser')
 
     def scrape_title(self):
         try:
