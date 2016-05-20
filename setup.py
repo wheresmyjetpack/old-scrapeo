@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name='Scrap-EO',
     version= '1.0',
-    py_modules=['scrapeo'],
+    packages = find_packages(),
     install_requires=[
         'Click',
         'requests',
@@ -11,7 +11,7 @@ setup(
         ],
     entry_points='''
         [console_scripts]
-        scrapeo=scrapeo:cli
+        scrapeo=main:cli
     ''',
 )
 
