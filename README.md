@@ -27,3 +27,4 @@ Alternatively, if you want to contribute to scrap-eo, it is recommended that you
 * Add regex matching functionality to the `--meta` option
 * Add option to audit sites making use of HTML5 spec 
 * Add colored output support ([colorama](https://pypi.python.org/pypi/colorama) integration with click)
+* Setup a Makefile for easier installation
