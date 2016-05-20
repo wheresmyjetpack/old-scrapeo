@@ -11,10 +11,13 @@ class ScrapEO(object):
             return self.soup.title.text.encode('utf-8').strip()
 
         except AttributeError:
-            click.echo('Document contains no title tag')
+            return
 
     def scrape_meta(self, *names):
         # Returns a dictionary of all meta with attribute name == name
+
+        # Unique the list of names
+        names = set(names)
         meta_all = {}
 
         for name in names:
@@ -24,10 +27,4 @@ class ScrapEO(object):
         return meta_all
 
     def scrape_h1s(self):
-        h1s = self.soup.find_all('h1')
-        h1s_all = []
-        count = 1
-
-        for h1 in h1s:
-            h1s_all.append('%s.) %s' % (count, h1.text.encode('utf-8').strip()))
-            count += 1
+        return [ h1.text.encode('utf-8').strip() for h1 in self.soup.find_all('h1') ]

@@ -20,40 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import requests
 import click
 import sys
-from bs4 import BeautifulSoup
+
+from scrapeo.core import ScrapEO
 
 
 def opts_provided(*args):
     return any(args)
-
-def scrape_title(soup):
-    try:
-        _title = soup.title.text.encode('utf-8').strip()
-        _title_out = 'Title: %s' % _title
-        click.echo(_title_out)
-
-    except AttributeError:
-        click.echo('Document contains no title tag')
-
-def scrape_meta(soup, name):
-    _meta = soup.find_all('meta', { 'name': name })
-
-    if any(_meta):
-        for i in _meta:
-            _meta_out = 'Meta %s: %s' % (name, i['content'].encode('utf-8').strip())
-            click.echo(_meta_out)
-
-    else:
-        click.echo('Document contains no meta tags by the name "%s"' % name)
-
-def scrape_h1s(soup):
-    _h1s = soup.find_all('h1')
-    click.echo('h1\'s:')
-    count = 1
-
-    for _h1 in _h1s:
-        click.echo('%s.) %s' % (count, _h1.text.encode('utf-8').strip()))
-        count += 1
 
 @click.command()
 @click.option('--title', '-t', is_flag='true',
@@ -77,20 +49,26 @@ def cli(title, meta, h1, url):
         # Raise an exception if request returns "bad" status
         req.raise_for_status()
         html = req.text
-        soup = BeautifulSoup(html, 'html.parser')
+        scrapeo = ScrapEO(html)
 
         # Run without options provided (default behavior)
         if not opts_provided(title, meta, h1):
-            scrape_title(soup)
-            scrape_meta(soup, 'description')
+            print 'NO OPTS'
+            click.echo('Title: %s' % scrapeo.scrape_title())
+            click.echo('Meta description %s' % scrapeo.scrape_meta('description'))
             sys.exit(0)
 
         # Flags
         if title:
-            scrape_title(soup)
+            click.echo('Title: %s' % (scrapeo.scrape_title()))
 
         if h1:
-            scrape_h1s(soup)
+            _h1s = scrape_h1s()
+            count = 1
+
+            for _h1 in _h1s:
+               click.echo('%d) %s' (count, _h1))
+               count += 1
 
         # Options w/ args
         if meta:
