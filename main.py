@@ -27,10 +27,11 @@ from scrapeo.utils import opts_provided
 @click.command()
 @click.option('--title', '-t', is_flag='true',
         help='Tell scrapeo to print the title of the document.')
-@click.option('--meta', '-m',
-        help='Search meta tags by name and print their content')
 @click.option('--h1', is_flag='true',
         help='Tell scrapeo to print the text node for all h1\'s in the document')
+@click.option('--meta', '-m',
+        multiple=True,
+        help='Search meta tags by name and print their content')
 @click.argument('url')
 def cli(title, h1, meta, url):
     """ Scrape data from a document found at URL for SEO data analysis """

@@ -18,13 +18,13 @@ class ScrapEO(object):
 
         # Unique the list of names
         names = set(names)
-        meta_all = {}
+        meta = {}
 
         for name in names:
             meta_from_soup = self.soup.find_all('meta', { 'name': name })
-            meta_all[name] = [ ele['content'].encode('utf-8').strip() for ele in meta_from_soup ]
+            meta[name] = [ele['content'].encode('utf-8').strip() for ele in meta_from_soup]
 
-        return meta_all
+        return meta
 
     def scrape_h1s(self):
-        return [ h1.text.encode('utf-8').strip() for h1 in self.soup.find_all('h1') ]
+        return [h1.text.encode('utf-8').strip() for h1 in self.soup.find_all('h1')]
