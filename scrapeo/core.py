@@ -15,9 +15,6 @@ class ScrapEO(object):
 
     def scrape_meta(self, *names):
         # Returns a dictionary of all meta with attribute name == name
-
-        # Unique the list of names
-        names = set(names)
         meta = {}
 
         for name in names:

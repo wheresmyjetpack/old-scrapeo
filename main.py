@@ -22,7 +22,7 @@ import sys
 
 """ Local imports """
 from scrapeo.core import ScrapEO
-from scrapeo.utils import opts_provided
+from scrapeo.utils import opts_provided, get_title, get_h1s, get_meta
 
 @click.command()
 @click.option('--title', '-t', is_flag='true',
@@ -55,21 +55,28 @@ def cli(title, h1, meta, url):
             click.echo('Meta description %s' % scrapeo.scrape_meta('description'))
             sys.exit(0)
 
-        # Flags
+        ### Flags ###
+
+        # --title flag
         if title:
             click.echo('Title: %s' % (scrapeo.scrape_title()))
 
+        # --h1 flag
         if h1:
-            _h1s = scrape_h1s()
+            _h1s = scrapeo.scrape_h1s()
             count = 1
 
             for _h1 in _h1s:
                click.echo('%d) %s' (count, _h1))
                count += 1
 
-        # Options w/ args
+        ### Options w/ args ###
+
+        # --meta option
         if meta:
-            click.echo(scrapeo.scrape_meta(meta))
+            for name in meta:
+                for meta_content in scrapeo.scrape_meta(name)[name]:
+                    click.echo('Meta %s: %s' % (name, meta_content))
 
     except requests.exceptions.RequestException, e:
         # "Bad" status codes, improper input
