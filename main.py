@@ -87,5 +87,24 @@ def cli(title, h1, meta, url):
 
     except requests.exceptions.RequestException, e:
         # "Bad" status codes, improper input
-        for arg in e.args:
-            print arg
+        if isinstance(e, requests.exceptions.ConnectionError):
+            click.echo('CONNECION ERROR')
+            click.echo('[-] Possible DNS failure, the connection may have been refused by the host, or the host may be down')
+
+        if isinstance(e, requests.exceptions.HTTPError):
+            click.echo('HTTP ERROR')
+            click.echo('[-] The server returned an invalid response')
+
+            for arg in e.args:
+                click.echo(arg)
+
+        if isinstance(e, requests.exceptions.Timeout):
+            click.echo('TIMEOUT')
+            click.echo('[-] The request to %s timed out' % url)
+
+        if isinstance(e, requests.exceptions.TooManyRedirects):
+            click.echo('TOO MANY REDIRECTS')
+            click.echo('[-] Request exceeded the maximum number of redirects')
+
+        #for arg in e.args:
+            #print arg
