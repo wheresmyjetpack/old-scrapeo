@@ -22,7 +22,9 @@ import sys
 
 """ Local imports """
 from scrapeo.core import ScrapEO
-from scrapeo.utils import opts_provided, get_title, get_h1s, get_meta
+from scrapeo.utils import opts_provided
+
+DEFAULT_META = 'description'
 
 @click.command()
 @click.option('--title', '-t', is_flag='true',
@@ -52,7 +54,12 @@ def cli(title, h1, meta, url):
         # Run without options provided (default behavior)
         if not opts_provided(title, meta, h1):
             click.echo('Title: %s' % scrapeo.scrape_title())
-            click.echo('Meta description %s' % scrapeo.scrape_meta('description'))
+            try:
+                click.echo('Meta %s: %s' % (DEFAULT_META, scrapeo.scrape_meta(DEFAULT_META)[DEFAULT_META][0]))
+
+            except IndexError:
+                click.echo('Meta %s: %s' % (DEFAULT_META, 'None'))
+
             sys.exit(0)
 
         ### Flags ###
