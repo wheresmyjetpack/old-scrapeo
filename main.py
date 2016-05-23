@@ -44,6 +44,7 @@ def cli(title, h1, meta, url):
         click.echo('Rebuilt url to %s...' % url)
 
     try:
+        url = url.decode('utf-8')
         req = requests.get(url)
 
         # Raise an exception if request returns "bad" status
