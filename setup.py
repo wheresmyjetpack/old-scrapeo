@@ -1,9 +1,9 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='Scrap-EO',
-    version= '1.0',
-    py_modules=['scrapeo'],
+    version= '1.1',
+    packages = find_packages(),
     install_requires=[
         'Click',
         'requests',
@@ -11,7 +11,7 @@ setup(
         ],
     entry_points='''
         [console_scripts]
-        scrapeo=scrapeo:cli
+        scrapeo=main:cli
     ''',
 )
 
