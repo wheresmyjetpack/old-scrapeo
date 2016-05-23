@@ -59,7 +59,7 @@ def cli(title, h1, meta, url):
                 click.echo('Meta %s: %s' % (DEFAULT_META, scrapeo.scrape_meta(DEFAULT_META)[DEFAULT_META][0]))
 
             except IndexError:
-                click.echo('Meta %s: %s' % (DEFAULT_META, 'None'))
+                pass
 
             sys.exit(0)
 
