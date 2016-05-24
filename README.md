@@ -22,7 +22,7 @@ After running `pip install .`, an executable Python file will be generated in yo
 Alternatively, if you want to contribute to scrap-eo, it is recommended that you `pip install --editable .` so any changes you make to the source code take effect immediately. Otherwise, you must reinstall scrap-eo everytime you make changes.
 
 ## Planned Features
-* ~~Create an API for scrap-eo, moving the functions for scraping data to a separate file that contains a `ScrapEO` class ~~
+* ~~Create an API for scrap-eo, moving the functions for scraping data to a separate file that contains a `ScrapEO` class~~
 * Add an argument to the `--meta` option to scrape the content from all meta tags in a document (e.g. `--meta *`)
 * Add regex matching functionality to the `--meta` option
 * Add option to audit sites making use of HTML5 spec 
