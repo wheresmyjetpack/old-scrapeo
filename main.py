@@ -23,7 +23,14 @@ import sys
 """ Local imports """
 from scrapeo.core import ScrapEO
 
+# Defaults
 DEFAULT_META = 'description'
+
+# Styled text
+H1_STYLED = click.style('h1\'s', fg='green')
+TITLE_STYLED = click.style('Title', fg='green')
+META_STYLED = click.style('Meta', fg='green')
+NEG_INDICATOR = click.style('[-]', fg='red')
 
 @click.command()
 @click.option('--title', '-t', is_flag='true',
@@ -58,7 +65,8 @@ def cli(title, h1, allmeta, meta, url):
             click.echo('Title: %s' % scrapeo.scrape_title())
             try:
                 scraped_meta = scrapeo.scrape_meta(DEFAULT_META)
-                click.echo('Meta %s: %s' % (DEFAULT_META, scraped_meta[DEFAULT_META][0]))
+                click.echo('%s' % META_STYLED)
+                click.echo('  %s: %s' % (click.style(DEFAULT_META, fg='yellow'), scraped_meta[DEFAULT_META][0]))
 
             except IndexError:
                 pass
@@ -69,15 +77,13 @@ def cli(title, h1, allmeta, meta, url):
 
         # --title flag
         if title:
-            styled_title = click.style('Title', fg='green')
-            click.echo('%s: %s' % (styled_title, scrapeo.scrape_title()))
+            click.echo('%s: %s' % (TITLE_STYLED, scrapeo.scrape_title()))
 
         # --h1 flag
         if h1:
             _h1s = scrapeo.scrape_h1s()
             count = 1
-            h1_header = click.style('h1\'s:', fg='green')
-            click.echo(h1_header)
+            click.echo(H1_STYLED)
 
             for _h1 in _h1s:
                click.echo('  %d) %s' % (count, _h1))
@@ -85,8 +91,7 @@ def cli(title, h1, allmeta, meta, url):
 
         if allmeta:
             scraped_meta = scrapeo.scrape_meta()
-            styled_meta = click.style('Meta', fg='green')
-            click.echo('%s:' % styled_meta)
+            click.echo('%s:' % META_STYLED)
 
             for name in scraped_meta.keys():
                 for content in scraped_meta[name]:
@@ -98,28 +103,28 @@ def cli(title, h1, allmeta, meta, url):
         # --meta option
         if meta:
             scraped_meta = scrapeo.scrape_meta(*meta)
-            click.echo('Meta:')
+            click.echo('%s:' % META_STYLED)
             for name in scraped_meta.keys():
                 for content in scraped_meta[name]:
-                    click.echo('  %s: %s' % (name, content))
+                    click.echo('  %s: %s' % (click.style(name, fg='yellow'), content))
 
     except requests.exceptions.RequestException, e:
         # "Bad" status codes, improper input
         if isinstance(e, requests.exceptions.ConnectionError):
             click.echo(click.style('CONNECION ERROR', bg='red'))
-            click.echo('[-] Possible DNS failure, the connection may have been refused by the host, or the host may be down')
+            click.echo('%s Possible DNS failure, the connection may have been refused by the host, or the host may be down' % NEG_INDICATOR)
 
         if isinstance(e, requests.exceptions.HTTPError):
             click.echo(click.style('HTTP ERROR', bg='red'))
-            click.echo('[-] The server returned an invalid response')
+            click.echo('%s The server returned an invalid response' % NEG_INDICATOR)
 
             for arg in e.args:
                 click.echo(arg)
 
         if isinstance(e, requests.exceptions.Timeout):
             click.echo(click.style('TIMEOUT'), bg='red')
-            click.echo('[-] The request to %s timed out' % url)
+            click.echo('%s The request to %s timed out' % (NEG_INDICATOR, url))
 
         if isinstance(e, requests.exceptions.TooManyRedirects):
-            click.echo(click.style('TOO MANY REDIRECTS'), bg='red')
-            click.echo('[-] Request exceeded the maximum number of redirects')
+            click.echo(click.style('TOO MANY REDIRECTS', bg='red'))
+            click.echo('%s Request exceeded the maximum number of redirects' % NEG_INDICATOR)

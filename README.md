@@ -27,7 +27,7 @@ Alternatively, if you want to contribute to scrap-eo, it is recommended that you
 * Deal with and provide information about non-self-closing meta tags
 * Add regex matching functionality to the `--meta` option
 * Add option to audit sites making use of HTML5 spec 
-* Add colored output support ([colorama](https://pypi.python.org/pypi/colorama) integration with click)
+* ~~Add colored output support ([colorama](https://pypi.python.org/pypi/colorama) integration with click)~~
 * Setup a Makefile for easier installation
 
 ## Version Notes
@@ -40,3 +40,4 @@ Alternatively, if you want to contribute to scrap-eo, it is recommended that you
 #### 1.1.2
 * Added the --allmeta option to get the content from every self-closing meta tag in the document
 * Made output from meta commands more readable by using indentation 
+* Added ANSI colors to output
