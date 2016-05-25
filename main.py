@@ -30,7 +30,7 @@ DEFAULT_META = 'description'
         help='Tell scrapeo to print the title of the document.')
 @click.option('--h1', is_flag='true',
         help='Tell scrapeo to print the text node for all h1\'s in the document')
-@click.option('--allmeta', is_flag='true',
+@click.option('--allmeta', '-a', is_flag='true',
         help='Tell scrapeo to print the content from all meta tags')
 @click.option('--meta', '-m',
         multiple=True,
