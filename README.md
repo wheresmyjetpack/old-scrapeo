@@ -36,6 +36,7 @@ Alternatively, if you want to contribute to scrap-eo, it is recommended that you
 * Provide multiple arguments to find meta tags by name using multiple instances of the `--meta` option
 * Connection errors now provide more human-readable information
 * Bugfix for URL's with UTF-8 encoded characters
+
 #### 1.1.2
 * Added the --allmeta option to get the content from every self-closing meta tag in the document
 * Made output from meta commands more readable by using indentation 
