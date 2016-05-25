@@ -22,7 +22,6 @@ import sys
 
 """ Local imports """
 from scrapeo.core import ScrapEO
-from scrapeo.utils import opts_provided
 
 DEFAULT_META = 'description'
 
@@ -31,11 +30,13 @@ DEFAULT_META = 'description'
         help='Tell scrapeo to print the title of the document.')
 @click.option('--h1', is_flag='true',
         help='Tell scrapeo to print the text node for all h1\'s in the document')
+@click.option('--allmeta', is_flag='true',
+        help='Tell scrapeo to print the content from all meta tags')
 @click.option('--meta', '-m',
         multiple=True,
         help='Search meta tags by name and print their content')
 @click.argument('url')
-def cli(title, h1, meta, url):
+def cli(title, h1, allmeta, meta, url):
     """ Scrape data from a document found at URL for SEO data analysis """
 
     # Rebuild URL if schema is not provided
@@ -53,10 +54,11 @@ def cli(title, h1, meta, url):
         scrapeo = ScrapEO(html)
 
         # Run without options provided (default behavior)
-        if not opts_provided(title, meta, h1):
+        if not any([title, allmeta, meta, h1]):
             click.echo('Title: %s' % scrapeo.scrape_title())
             try:
-                click.echo('Meta %s: %s' % (DEFAULT_META, scrapeo.scrape_meta(DEFAULT_META)[DEFAULT_META][0]))
+                scraped_meta = scrapeo.scrape_meta(DEFAULT_META)
+                click.echo('Meta %s: %s' % (DEFAULT_META, scraped_meta[DEFAULT_META][0]))
 
             except IndexError:
                 pass
@@ -78,13 +80,22 @@ def cli(title, h1, meta, url):
                click.echo('%d) %s' (count, _h1))
                count += 1
 
+        if allmeta:
+            scraped_meta = scrapeo.scrape_meta()
+            click.echo('Meta:')
+            for name in scraped_meta.keys():
+                for content in scraped_meta[name]:
+                    click.echo('  %s: %s' % (name, content))
+
         ### Options w/ args ###
 
         # --meta option
         if meta:
-            for name in meta:
-                for meta_content in scrapeo.scrape_meta(name)[name]:
-                    click.echo('Meta %s: %s' % (name, meta_content))
+            scraped_meta = scrapeo.scrape_meta(*meta)
+            click.echo('Meta:')
+            for name in scraped_meta.keys():
+                for content in scraped_meta[name]:
+                    click.echo('  %s: %s' % (name, content))
 
     except requests.exceptions.RequestException, e:
         # "Bad" status codes, improper input
@@ -106,6 +117,3 @@ def cli(title, h1, meta, url):
         if isinstance(e, requests.exceptions.TooManyRedirects):
             click.echo('TOO MANY REDIRECTS')
             click.echo('[-] Request exceeded the maximum number of redirects')
-
-        #for arg in e.args:
-            #print arg
