@@ -25,7 +25,7 @@ class ScrapEO(object):
 
                 try:
                     if ele.isSelfClosing:
-                        meta[ele['name']].append(ele['content'].encode('utf-8').strip())
+                        meta[ele['name'].encode('utf-8')].append(ele['content'].encode('utf-8').strip())
 
                 except KeyError:
                     # Meta tag does not possess "name" attr
@@ -34,7 +34,7 @@ class ScrapEO(object):
         else:
             for name in names:
                 meta_from_soup = self.soup.find_all('meta', { 'name': name })
-                meta[name] = [ele['content'].encode('utf-8').strip() for ele in meta_from_soup]
+                meta[name.encode('utf-8')] = [ele['content'].encode('utf-8').strip() for ele in meta_from_soup]
 
         return meta
 

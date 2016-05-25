@@ -8,6 +8,7 @@ setup(
         'Click',
         'requests',
         'beautifulsoup4',
+        'colorama'
         ],
     entry_points='''
         [console_scripts]
