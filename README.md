@@ -23,7 +23,8 @@ Alternatively, if you want to contribute to scrap-eo, it is recommended that you
 
 ## Planned Features
 * ~~Create an API for scrap-eo, moving the functions for scraping data to a separate file that contains a `ScrapEO` class~~
-* Add an argument to the `--meta` option to scrape the content from all meta tags in a document (e.g. `--meta *`)
+* ~~Add an argument to the `--meta` option to scrape the content from all meta tags in a document (e.g. `--meta *`)~~
+* Deal with and provide information about non-self-closing meta tags
 * Add regex matching functionality to the `--meta` option
 * Add option to audit sites making use of HTML5 spec 
 * Add colored output support ([colorama](https://pypi.python.org/pypi/colorama) integration with click)
@@ -35,3 +36,6 @@ Alternatively, if you want to contribute to scrap-eo, it is recommended that you
 * Provide multiple arguments to find meta tags by name using multiple instances of the `--meta` option
 * Connection errors now provide more human-readable information
 * Bugfix for URL's with UTF-8 encoded characters
+#### 1.1.2
+* Added the --allmeta option to get the content from every self-closing meta tag in the document
+* Made output from meta commands more readable by using indentation 
