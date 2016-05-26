@@ -22,7 +22,10 @@ import sys
 
 """ Local imports """
 from scrapeo.core import ScrapEO
+from scrapeo.utils import format_meta_out
 
+
+""" Constants """
 # Defaults
 DEFAULT_META = 'description'
 
@@ -38,7 +41,7 @@ NEG_INDICATOR = click.style('[-]', fg='red')
 @click.option('--h1', is_flag='true',
         help='Tell scrapeo to print the text node for all h1\'s in the document')
 @click.option('--allmeta', '-a', is_flag='true',
-        help='Tell scrapeo to print the content from all meta tags')
+        help='Tell scrapeo to print the content (if it exists) from all self-closing meta tags')
 @click.option('--meta', '-m',
         multiple=True,
         help='Search meta tags by name and print their content')
@@ -49,7 +52,7 @@ def cli(title, h1, allmeta, meta, url):
     # Rebuild URL if schema is not provided
     if not (url[:7] == 'http://' or url[:8] == 'https://'):
         url = 'http://%s' % url
-        click.echo('Rebuilt url to %s...' % url)
+        click.echo('Rebuilt url to %s...\n' % click.style(url, fg="yellow"))
 
     try:
         url = url.decode('utf-8')
@@ -62,18 +65,16 @@ def cli(title, h1, allmeta, meta, url):
 
         # Run without options provided (default behavior)
         if not any([title, allmeta, meta, h1]):
-            click.echo('Title: %s' % scrapeo.scrape_title())
-            try:
-                scraped_meta = scrapeo.scrape_meta(DEFAULT_META)
-                click.echo('%s' % META_STYLED)
-                click.echo('  %s: %s' % (click.style(DEFAULT_META, fg='yellow'), scraped_meta[DEFAULT_META][0]))
+            scraped_meta = scrapeo.scrape_meta(DEFAULT_META)
+            click.echo('%s: %s' % (TITLE_STYLED, scrapeo.scrape_title()))
+            click.echo('%s' % META_STYLED)
 
-            except IndexError:
-                pass
+            for i in format_meta_out(scraped_meta):
+                click.echo(i)
 
             sys.exit(0)
 
-        ### Flags ###
+        """ Flags and Options """
 
         # --title flag
         if title:
@@ -89,24 +90,21 @@ def cli(title, h1, allmeta, meta, url):
                click.echo('  %d) %s' % (count, _h1))
                count += 1
 
-        if allmeta:
-            scraped_meta = scrapeo.scrape_meta()
+        if allmeta or meta:
+
+            # --allmeta flag
+            if allmeta:
+                scraped_meta = scrapeo.scrape_meta()
+
+            # --meta option
+            elif meta:
+                scraped_meta = scrapeo.scrape_meta(*meta)
+
             click.echo('%s:' % META_STYLED)
 
-            for name in scraped_meta.keys():
-                for content in scraped_meta[name]:
-                    styled_name = click.style('%s' % name, fg='yellow')
-                    click.echo('  %s: %s' % (styled_name, content))
+            for i in format_meta_out(scraped_meta):
+                click.echo(i)
 
-        ### Options w/ args ###
-
-        # --meta option
-        if meta:
-            scraped_meta = scrapeo.scrape_meta(*meta)
-            click.echo('%s:' % META_STYLED)
-            for name in scraped_meta.keys():
-                for content in scraped_meta[name]:
-                    click.echo('  %s: %s' % (click.style(name, fg='yellow'), content))
 
     except requests.exceptions.RequestException, e:
         # "Bad" status codes, improper input
