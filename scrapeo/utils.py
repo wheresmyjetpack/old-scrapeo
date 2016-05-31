@@ -23,7 +23,7 @@ def format_meta_out(scraped_meta):
 def rebuild_url(url):
     if not (url[:7] == 'http://' or url[:8] == 'https://'):
         url = 'http://%s' % url
-        echo('Rebuilt url to %s...\n' % style(url, fg="yellow"))
+        echo('Rebuilt url to %s...' % style(url, fg="yellow"))
 
     return url.decode('utf-8')
 

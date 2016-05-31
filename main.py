@@ -76,13 +76,13 @@ def cli(title, h1, allmeta, meta, articles, url):
 
         # --title flag
         if title:
-            click.echo('%s: %s' % (TITLE_STYLED, scrapeo.scrape_title()))
+            click.echo('\n%s: %s' % (TITLE_STYLED, scrapeo.scrape_title()))
 
         # --h1 flag
         if h1:
             _h1s = scrapeo.scrape_h1s()
             count = 1
-            click.echo(H1_STYLED)
+            click.echo('\n%s' % H1_STYLED)
 
             for _h1 in _h1s:
                click.echo('  %d) %s' % (count, _h1))
@@ -98,14 +98,20 @@ def cli(title, h1, allmeta, meta, articles, url):
             elif meta:
                 scraped_meta = scrapeo.scrape_meta(*meta)
 
-            click.echo('%s:' % META_STYLED)
+            click.echo('\n%s:' % META_STYLED)
 
             for i in format_meta_out(scraped_meta):
                 click.echo(i)
 
+        # --articles option
         if articles:
             scraped_articles = scrapeo.scrape_articles()
-            click.echo('%d article(s) found in the document' % len(scraped_articles))
+            click.echo('\n%s article(s) found in the document' % click.style(str(len(scraped_articles)), fg='green'))
+            article_count = 1
+
+            for article in scraped_articles:
+                click.echo('  %d) %s' % (article_count, article['heading']))
+                article_count += 1
 
     except requests.exceptions.RequestException, e:
         # "Bad" status codes, improper input
