@@ -15,7 +15,9 @@ class ScrapEO(object):
             return
 
     def scrape_meta(self, *names):
-        # Returns a dictionary of all meta with attribute name == name
+        # Returns a dictionary containing the attributes and
+        # content of each self-closing meta tag in the 
+        # document
         meta = defaultdict(list)
 
         if not any(names):
@@ -39,11 +41,13 @@ class ScrapEO(object):
         return meta
 
     def scrape_h1s(self):
+        # Returns a list of all h1's in the document
         return [h1.text.encode('utf-8').strip() for h1 in self.soup.find_all('h1')]
 
     def scrape_articles(self):
         # Returns a list of articles
-        # Each article is a dictionary with 'heading' and 'content' keys
+        # Each article is a dictionary which may contain
+        # 'heading' and 'content' keys
         articles = []
 
         for article in self.soup.find_all('article'):
@@ -55,17 +59,23 @@ class ScrapEO(object):
             for section in article.find_all('section'):
                 section_data = {}
                 try:
-                    section_data['heading'] = section.find('h2').text.encode('utf-8')
+                    headings = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']
+
+                    for tag in section.contents:
+                        if tag.name in headings:
+                            # The first h tag in the section is the 
+                            # section heading
+                            section_data['heading'] = tag.text.encode('utf-8')
+                            break
 
                 except AttributeError:
                     # Section does not contain a heading
                     # Do not create a 'heading' key so we can raise
-                    # another AttributeError later when parsing the reutrned
-                    # articles list
+                    # another AttributeError later when accessing
+                    # values in the articles list
                     pass
 
                 section_data['content'] = [paragraph.text.encode('utf-8') for paragraph in section.find_all('p')]
-
                 article_data['sections'].append(section_data)
 
             articles.append(article_data)
