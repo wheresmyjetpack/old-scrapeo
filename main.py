@@ -22,7 +22,7 @@ import sys
 
 """ Local imports """
 from scrapeo.core import ScrapEO
-from scrapeo.utils import format_meta_out
+from scrapeo.utils import format_meta_out, rebuild_url, handle_errors
 
 
 """ Constants """
@@ -33,7 +33,6 @@ DEFAULT_META = 'description'
 H1_STYLED = click.style('h1\'s', fg='green')
 TITLE_STYLED = click.style('Title', fg='green')
 META_STYLED = click.style('Meta', fg='green')
-NEG_INDICATOR = click.style('[-]', fg='red')
 
 @click.command()
 @click.option('--title', '-t', is_flag='true',
@@ -50,12 +49,9 @@ def cli(title, h1, allmeta, meta, url):
     """ Scrape data from a document found at URL for SEO data analysis """
 
     # Rebuild URL if schema is not provided
-    if not (url[:7] == 'http://' or url[:8] == 'https://'):
-        url = 'http://%s' % url
-        click.echo('Rebuilt url to %s...\n' % click.style(url, fg="yellow"))
+    url = rebuild_url(url)
 
     try:
-        url = url.decode('utf-8')
         req = requests.get(url)
 
         # Raise an exception if request returns "bad" status
@@ -108,21 +104,4 @@ def cli(title, h1, allmeta, meta, url):
 
     except requests.exceptions.RequestException, e:
         # "Bad" status codes, improper input
-        if isinstance(e, requests.exceptions.ConnectionError):
-            click.echo(click.style('CONNECION ERROR', bg='red'))
-            click.echo('%s Possible DNS failure, the connection may have been refused by the host, or the host may be down' % NEG_INDICATOR)
-
-        if isinstance(e, requests.exceptions.HTTPError):
-            click.echo(click.style('HTTP ERROR', bg='red'))
-            click.echo('%s The server returned an invalid response' % NEG_INDICATOR)
-
-            for arg in e.args:
-                click.echo(arg)
-
-        if isinstance(e, requests.exceptions.Timeout):
-            click.echo(click.style('TIMEOUT'), bg='red')
-            click.echo('%s The request to %s timed out' % (NEG_INDICATOR, url))
-
-        if isinstance(e, requests.exceptions.TooManyRedirects):
-            click.echo(click.style('TOO MANY REDIRECTS', bg='red'))
-            click.echo('%s Request exceeded the maximum number of redirects' % NEG_INDICATOR)
+        handle_errors(e)
