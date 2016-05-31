@@ -29,6 +29,7 @@ Alternatively, if you want to contribute to scrap-eo, it is recommended that you
 * Add option to audit sites making use of HTML5 spec 
 * ~~Add colored output support ([colorama](https://pypi.python.org/pypi/colorama) integration with click)~~
 * Setup a Makefile for easier installation
+* Move all existing options to their own commands (i.e., `scrapeo meta http://example.com` and `scrapeo title http://example.com`)
 
 ## Version Notes
 ### 1.1
