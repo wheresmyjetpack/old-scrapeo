@@ -33,6 +33,12 @@ DEFAULT_META = 'description'
 H1_STYLED = click.style('h1\'s', fg='green')
 TITLE_STYLED = click.style('Title', fg='green')
 META_STYLED = click.style('Meta', fg='green')
+ARTICLE_STYLED = click.style('Article', fg='yellow')
+SECTION_STYLED = click.style('Section', fg='yellow')
+CONTENT_STYLED = click.style('Content', fg='yellow')
+
+# Misc.
+TRUNCATE_LENGTH = 100
 
 @click.command()
 @click.option('--title', '-t', is_flag='true',
@@ -107,11 +113,20 @@ def cli(title, h1, allmeta, meta, articles, url):
         if articles:
             scraped_articles = scrapeo.scrape_articles()
             click.echo('\n%s article(s) found in the document' % click.style(str(len(scraped_articles)), fg='green'))
-            article_count = 1
 
             for article in scraped_articles:
-                click.echo('  %d) %s' % (article_count, article['heading']))
-                article_count += 1
+                click.echo('  %s: %s' % (ARTICLE_STYLED, click.style(article['heading'], fg='green')))
+
+                for section in article['sections']:
+                    try:
+                        click.echo('    %s: %s' % (SECTION_STYLED, click.style(section['heading'], fg='green')))
+                    except KeyError:
+                        click.echo('    %s: %s' % (SECTION_STYLED, click.style('NO HEADING', bg='blue')))
+
+                    # Display the first 24 characters from the first
+                    # paragraph in the content
+                    truncated_content = '%s...' % section['content'][0][:TRUNCATE_LENGTH]
+                    click.echo('      %s: %s' % (CONTENT_STYLED, truncated_content))
 
     except requests.exceptions.RequestException, e:
         # "Bad" status codes, improper input

@@ -1,4 +1,5 @@
 import requests
+import re
 from collections import defaultdict
 from bs4 import BeautifulSoup
 
@@ -53,20 +54,17 @@ class ScrapEO(object):
         for article in self.soup.find_all('article'):
             article_data = {}
 
-            article_data['heading'] = article.h1.text.encode('utf-8')
+            # The first h tag in the article is the
+            # article heading
+            article_data['heading'] = article.find(re.compile('h[1-6]')).text.encode('utf-8')
             article_data['sections'] = []
 
             for section in article.find_all('section'):
                 section_data = {}
                 try:
-                    headings = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']
-
-                    for tag in section.contents:
-                        if tag.name in headings:
-                            # The first h tag in the section is the 
-                            # section heading
-                            section_data['heading'] = tag.text.encode('utf-8')
-                            break
+                    # The first h tag in the section is the 
+                    # section heading
+                    section_data['heading'] = section.find(re.compile('h[1-6]')).text.encode('utf-8')
 
                 except AttributeError:
                     # Section does not contain a heading
