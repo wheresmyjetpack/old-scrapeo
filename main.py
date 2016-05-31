@@ -36,16 +36,18 @@ META_STYLED = click.style('Meta', fg='green')
 
 @click.command()
 @click.option('--title', '-t', is_flag='true',
-        help='Tell scrapeo to print the title of the document.')
+        help='Tell scrapeo to print the title of the document')
 @click.option('--h1', is_flag='true',
         help='Tell scrapeo to print the text node for all h1\'s in the document')
 @click.option('--allmeta', '-a', is_flag='true',
         help='Tell scrapeo to print the content (if it exists) from all self-closing meta tags')
+@click.option('--articles', '-r', is_flag='true',
+        help='Tell scrapeo to print any articles on the page')
 @click.option('--meta', '-m',
         multiple=True,
         help='Search meta tags by name and print their content')
 @click.argument('url')
-def cli(title, h1, allmeta, meta, url):
+def cli(title, h1, allmeta, meta, articles, url):
     """ Scrape data from a document found at URL for SEO data analysis """
 
     # Rebuild URL if schema is not provided
@@ -60,7 +62,7 @@ def cli(title, h1, allmeta, meta, url):
         scrapeo = ScrapEO(html)
 
         # Run without options provided (default behavior)
-        if not any([title, allmeta, meta, h1]):
+        if not any([title, allmeta, meta, h1, articles]):
             scraped_meta = scrapeo.scrape_meta(DEFAULT_META)
             click.echo('%s: %s' % (TITLE_STYLED, scrapeo.scrape_title()))
             click.echo('%s' % META_STYLED)
@@ -101,6 +103,9 @@ def cli(title, h1, allmeta, meta, url):
             for i in format_meta_out(scraped_meta):
                 click.echo(i)
 
+        if articles:
+            scraped_articles = scrapeo.scrape_articles()
+            click.echo('%d article(s) found in the document' % len(scraped_articles))
 
     except requests.exceptions.RequestException, e:
         # "Bad" status codes, improper input

@@ -40,3 +40,34 @@ class ScrapEO(object):
 
     def scrape_h1s(self):
         return [h1.text.encode('utf-8').strip() for h1 in self.soup.find_all('h1')]
+
+    def scrape_articles(self):
+        # Returns a list of articles
+        # Each article is a dictionary with 'heading' and 'content' keys
+        articles = []
+
+        for article in self.soup.find_all('article'):
+            article_data = {}
+
+            article_data['heading'] = article.h1.text.encode('utf-8')
+            article_data['sections'] = []
+
+            for section in article.find_all('section'):
+                section_data = {}
+                try:
+                    section_data['heading'] = section.find('h2').text.encode('utf-8')
+
+                except AttributeError:
+                    # Section does not contain a heading
+                    # Do not create a 'heading' key so we can raise
+                    # another AttributeError later when parsing the reutrned
+                    # articles list
+                    pass
+
+                section_data['content'] = [paragraph.text.encode('utf-8') for paragraph in section.find_all('p')]
+
+                article_data['sections'].append(section_data)
+
+            articles.append(article_data)
+
+        return articles
