@@ -1,5 +1,6 @@
 import requests
 import re
+import sys
 from collections import defaultdict
 from bs4 import BeautifulSoup
 
@@ -13,31 +14,41 @@ class ScrapEO(object):
             return self.soup.title.text.encode('utf-8').strip()
 
         except AttributeError:
-            return
+            # No title tag present in the document
+            return None
 
     def scrape_meta(self, *names):
-        # Returns a dictionary containing the attributes and
-        # content of each self-closing meta tag in the 
-        # document
+        # Returns a dictionary containing the name attribute and
+        # content of each self-closing meta tag in the document
         meta = defaultdict(list)
 
-        if not any(names):
-            # Get every self closing meta tag from the soup
-            meta_from_soup = self.soup.find_all('meta')
-            for ele in meta_from_soup:
-
-                try:
-                    if ele.isSelfClosing:
-                        meta[ele['name'].encode('utf-8')].append(ele['content'].encode('utf-8').strip())
-
-                except KeyError:
-                    # Meta tag does not possess "name" attr
-                    pass
-
-        else:
+        if any(names):
+            # Search for meta tags by name
             for name in names:
                 meta_from_soup = self.soup.find_all('meta', { 'name': name })
-                meta[name.encode('utf-8')] = [ele['content'].encode('utf-8').strip() for ele in meta_from_soup]
+                meta[name.encode('utf-8')] = [tag['content'].encode('utf-8').strip() for tag in meta_from_soup]
+
+        else:
+            # or get every self closing meta tag from the soup
+            # Meta tag must possess the "name" attribute
+            meta_from_soup = self.soup.find_all('meta')
+            for tag in meta_from_soup:
+
+                #if tag.isSelfClosing:
+                # Does not work with HTML5 self closing tags
+                # i.e., those that do not close themseleves with a "/>"
+                try:
+                    meta[tag['name'].encode('utf-8')].append(tag['content'].encode('utf-8').strip())
+
+                except KeyError, e:
+                    offender = e.args[0]
+                    if offender == 'name':
+                        # Meta tag does not possess "name" attribute
+                        # Return instead the offending key as a string
+                        return 'name'
+
+                    else:
+                        return offender
 
         return meta
 

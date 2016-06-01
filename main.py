@@ -28,6 +28,7 @@ from scrapeo.utils import format_meta_out, rebuild_url, handle_errors
 """ Constants """
 # Defaults
 DEFAULT_META = 'description'
+TRUNCATE_LENGTH = 100
 
 # Styled text
 H1_STYLED = click.style('h1\'s', fg='green')
@@ -36,9 +37,6 @@ META_STYLED = click.style('Meta', fg='green')
 ARTICLE_STYLED = click.style('Article', fg='yellow')
 SECTION_STYLED = click.style('Section', fg='yellow')
 CONTENT_STYLED = click.style('Content', fg='yellow')
-
-# Misc.
-TRUNCATE_LENGTH = 100
 
 @click.command()
 @click.option('--title', '-t', is_flag='true',
@@ -82,7 +80,12 @@ def cli(title, h1, allmeta, meta, articles, url):
 
         # --title flag
         if title:
-            click.echo('\n%s: %s' % (TITLE_STYLED, scrapeo.scrape_title()))
+            scraped_title = scrapeo.scrape_title()
+
+            if not scraped_title:
+                scraped_title = click.style('NO TITLE', bg='blue')
+
+            click.echo('\n%s: %s' % (TITLE_STYLED, scraped_title))
 
         # --h1 flag
         if h1:
@@ -112,7 +115,9 @@ def cli(title, h1, allmeta, meta, articles, url):
         # --articles option
         if articles:
             scraped_articles = scrapeo.scrape_articles()
-            click.echo('\n%s article(s) found in the document' % click.style(str(len(scraped_articles)), fg='green'))
+            num_articles = click.style(str(len(scraped_articles)), fg='green')
+
+            click.echo('\n%s article(s) found in the document' % num_articles)
 
             for article in scraped_articles:
                 click.echo('  %s: %s' % (ARTICLE_STYLED, click.style(article['heading'], fg='green')))
@@ -123,8 +128,8 @@ def cli(title, h1, allmeta, meta, articles, url):
                     except KeyError:
                         click.echo('    %s: %s' % (SECTION_STYLED, click.style('NO HEADING', bg='blue')))
 
-                    # Display the first 24 characters from the first
-                    # paragraph in the content
+                    # Display the first n characters from the first
+                    # paragraph in the content, where n = TRUNCATE_LENGTH
                     truncated_content = '%s...' % section['content'][0][:TRUNCATE_LENGTH]
                     click.echo('      %s: %s' % (CONTENT_STYLED, truncated_content))
 
