@@ -17,38 +17,62 @@ class ScrapEO(object):
             # No title tag present in the document
             return None
 
-    def scrape_meta(self, *names):
+    def scrape_meta(self, *search_terms):
         # Returns a dictionary containing the name attribute and
         # content of each self-closing meta tag in the document
         meta = defaultdict(list)
 
-        if any(names):
+        if any(search_terms):
             # Search for meta tags by name
-            for name in names:
-                meta_from_soup = self.soup.find_all('meta', { 'name': name })
-                meta[name.encode('utf-8')] = [tag['content'].encode('utf-8').strip() for tag in meta_from_soup]
+            for term in search_terms:
+                meta_from_soup = self.soup.find_all('meta', {'name': term})
+                meta_from_soup = meta_from_soup if meta_from_soup else self.soup.find_all('meta', {'property': term})
+
+                meta[term] = [tag['content'].encode('utf-8').strip() for tag in meta_from_soup]
 
         else:
-            # or get every self closing meta tag from the soup
-            # Meta tag must possess the "name" attribute
+            # or get every meta tag from the soup
+            # Gathers meta tags if they contain either
+            # the name, property or http-equiv attributes
             meta_from_soup = self.soup.find_all('meta')
+
             for tag in meta_from_soup:
 
-                #if tag.isSelfClosing:
-                # Does not work with HTML5 self closing tags
-                # i.e., those that do not close themseleves with a "/>"
                 try:
-                    meta[tag['name'].encode('utf-8')].append(tag['content'].encode('utf-8').strip())
+                    content = tag['content'].encode('utf-8').strip()
 
                 except KeyError, e:
-                    offender = e.args[0]
-                    if offender == 'name':
-                        # Meta tag does not possess "name" attribute
-                        # Return instead the offending key as a string
-                        return 'name'
+                    if e.args[0] == 'content':
+                        # Meta tag doesn't contain the content attribute,
+                        # we don't care about it. Skip this iteration
+                        continue
 
                     else:
-                        return offender
+                        # We've encounterd an unknown error
+                        # Print it and exit
+                        print e
+                        sys.exit(1)
+
+                try:
+                    # Assume we're looking for the "name" attribute
+                    search_attr = tag['name']
+
+                except KeyError:
+                    try:
+                        # Assume we're looking for the property attribute next
+                        search_attr = tag['property']
+
+                    except KeyError:
+                        # Finally assume we're looking for the "http-equiv" attribute
+                        try:
+                            search_attr = tag['http-equiv']
+                            content = '%s  (http-equiv)' % content
+
+                        except KeyError:
+                            # None of the above three attributes, we don't care about it
+                            continue
+
+                meta[search_attr.encode('utf-8')].append(content)
 
         return meta
 

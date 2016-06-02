@@ -9,8 +9,8 @@ def opts_provided(*args):
     # No longer in use, redundant
     return any(args)
 
-def format_meta_out(scraped_meta):
-    # Return a list of strings each containing the value of the scraped
+def echo_meta(scraped_meta):
+    # Echo values of the scraped
     # meta tags' name and content attributes
     meta_out = []
 
@@ -18,7 +18,8 @@ def format_meta_out(scraped_meta):
         for content in name_content:
             meta_out.append('  %s: %s' % (style(name, fg='yellow'), content))
 
-    return meta_out
+    for i in meta_out:
+        echo(i)
 
 def rebuild_url(url):
     if not (url[:7] == 'http://' or url[:8] == 'https://'):

@@ -22,7 +22,7 @@ import sys
 
 """ Local imports """
 from scrapeo.core import ScrapEO
-from scrapeo.utils import format_meta_out, rebuild_url, handle_errors
+from scrapeo.utils import echo_meta, rebuild_url, handle_errors
 
 
 """ Constants """
@@ -71,9 +71,7 @@ def cli(title, h1, allmeta, meta, articles, url):
             click.echo('%s: %s' % (TITLE_STYLED, scrapeo.scrape_title()))
             click.echo('%s' % META_STYLED)
 
-            for i in format_meta_out(scraped_meta):
-                click.echo(i)
-
+            echo_meta(scraped_meta)
             sys.exit(0)
 
         """ Flags and Options """
@@ -108,9 +106,7 @@ def cli(title, h1, allmeta, meta, articles, url):
                 scraped_meta = scrapeo.scrape_meta(*meta)
 
             click.echo('\n%s:' % META_STYLED)
-
-            for i in format_meta_out(scraped_meta):
-                click.echo(i)
+            echo_meta(scraped_meta)
 
         # --articles option
         if articles:
