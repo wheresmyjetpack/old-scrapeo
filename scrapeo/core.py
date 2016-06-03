@@ -71,6 +71,11 @@ class ScrapEO(object):
         return [h1.text.encode('utf-8').strip() for h1 in self.soup.find_all('h1')]
 
     def scrape_articles(self):
+        # TODO This really should be more of a document
+        # outline generator, since it's becoming clear
+        # that this method will handle more than just specifically
+        # articles
+
         # Returns a list of articles
         # Each article is a dictionary which may contain
         # 'heading' and 'content' keys
