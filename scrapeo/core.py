@@ -57,7 +57,7 @@ class ScrapEO(object):
                     search_attr = self.__get_search_attr(tag)
 
                 except UnboundLocalError, e:
-                    print e[0]
+                    # print e[0]
                     # Tag does not have the name, property, or http-equiv
                     # attribute, we don't are about it. Skip itteration
                     continue
