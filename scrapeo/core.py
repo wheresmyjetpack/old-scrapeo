@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 class ScrapEO(object):
 
     def __init__(self, html):
+        # ScrapEO uses BeautifulSoup to parse the HTML passed to it
         self.soup = BeautifulSoup(html, 'html.parser')
 
     def scrape_title(self):
@@ -21,21 +22,20 @@ class ScrapEO(object):
         # Returns a dictionary containing the name attribute and
         # content of each self-closing meta tag in the document
         meta = defaultdict(list)
+        meta_from_soup = self.soup.find_all('meta')
 
+        # Search for meta tags by attribute value...
         if any(search_terms):
-            # Search for meta tags by name
             for term in search_terms:
-                meta_from_soup = self.soup.find_all('meta', {'name': term})
-                meta_from_soup = meta_from_soup if meta_from_soup else self.soup.find_all('meta', {'property': term})
 
-                meta[term] = [tag['content'].encode('utf-8').strip() for tag in meta_from_soup]
+                # Add the value of the "contents" attribute if one of the tag's attribute
+                # values is the search term provided
+                meta[term] = [tag['content'].encode('utf-8').strip() for tag in meta_from_soup if term in tag.attrs.values()]
 
+        # ...or get every meta tag from the soup
         else:
-            # or get every meta tag from the soup
             # Gathers meta tags if they contain either
             # the name, property or http-equiv attributes
-            meta_from_soup = self.soup.find_all('meta')
-
             for tag in meta_from_soup:
 
                 try:
@@ -104,6 +104,7 @@ class ScrapEO(object):
             articles.append(article_data)
 
         return articles
+
 
     """ Private methods """
 

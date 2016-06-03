@@ -14,7 +14,7 @@ def echo_meta(scraped_meta):
     # meta tags' name and content attributes
     meta_out = []
 
-    for name, name_content in scraped_meta.iteritems():
+    for name, name_content in sorted(scraped_meta.iteritems()):
         for content in name_content:
             meta_out.append('  %s: %s' % (style(name, fg='yellow'), content))
 
