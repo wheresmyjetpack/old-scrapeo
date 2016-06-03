@@ -19,8 +19,8 @@ class ScrapEO(object):
             return None
 
     def scrape_meta(self, *search_terms):
-        # Returns a dictionary containing the name attribute and
-        # content of each self-closing meta tag in the document
+        # Returns a dictionary containing the name|property|http-equiv
+        # attribute and content of each meta tag in the document
         meta = defaultdict(list)
         meta_from_soup = self.soup.find_all('meta')
 
@@ -59,7 +59,7 @@ class ScrapEO(object):
                 except UnboundLocalError, e:
                     # print e[0]
                     # Tag does not have the name, property, or http-equiv
-                    # attribute, we don't are about it. Skip itteration
+                    # attribute, we don't are about it. Skip iteration
                     continue
 
                 meta[search_attr.encode('utf-8')].append(content)
