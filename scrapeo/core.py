@@ -81,7 +81,7 @@ class ScrapEO(object):
 
             # The first h tag in the article is the
             # article heading
-            article_data['heading'] = article.find(re.compile('h[1-6]')).text.encode('utf-8')
+            article_data['heading'] = article.find(re.compile('h[1-6]')).text.encode('utf-8').strip()
             article_data['sections'] = []
 
             for section in article.find_all('section'):
@@ -89,7 +89,7 @@ class ScrapEO(object):
                 try:
                     # The first h tag in the section is the 
                     # section heading
-                    section_data['heading'] = section.find(re.compile('h[1-6]')).text.encode('utf-8')
+                    section_data['heading'] = section.find(re.compile('h[1-6]')).text.encode('utf-8').strip()
 
                 except AttributeError:
                     # Section does not contain a heading
