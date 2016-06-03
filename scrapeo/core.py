@@ -54,23 +54,13 @@ class ScrapEO(object):
                         sys.exit(1)
 
                 try:
-                    # Assume we're looking for the "name" attribute
-                    search_attr = tag['name']
+                    search_attr = self.__get_search_attr(tag)
 
-                except KeyError:
-                    try:
-                        # Assume we're looking for the property attribute next
-                        search_attr = tag['property']
-
-                    except KeyError:
-                        # Finally assume we're looking for the "http-equiv" attribute
-                        try:
-                            search_attr = tag['http-equiv']
-                            content = '%s  (http-equiv)' % content
-
-                        except KeyError:
-                            # None of the above three attributes, we don't care about it
-                            continue
+                except UnboundLocalError, e:
+                    print e[0]
+                    # Tag does not have the name, property, or http-equiv
+                    # attribute, we don't are about it. Skip itteration
+                    continue
 
                 meta[search_attr.encode('utf-8')].append(content)
 
@@ -114,3 +104,27 @@ class ScrapEO(object):
             articles.append(article_data)
 
         return articles
+
+    """ Private methods """
+
+    def __get_search_attr(self, tag):
+
+        if tag.has_attr('name'):
+            # Assume we're looking for the "name" attribute
+            search_attr = tag['name']
+
+        elif tag.has_attr('property'):
+            # Assume we're looking for the property attribute next
+            search_attr = tag['property']
+
+        elif tag.has_attr('http-equiv'):
+            # Finally assume we're looking for the "http-equiv" attribute
+            search_attr = tag['http-equiv']
+
+        else:
+            # None of the above three attributes, we don't care about it
+            # Used to raise ValueError later since search_attr has
+            # not been defined
+            pass
+
+        return search_attr
