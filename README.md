@@ -30,6 +30,7 @@ Alternatively, if you want to contribute to scrap-eo, it is recommended that you
 * ~~Add colored output support ([colorama](https://pypi.python.org/pypi/colorama) integration with click)~~
 * Setup a Makefile for easier installation
 * Move all existing options to their own commands (i.e., `scrapeo meta http://example.com` and `scrapeo title http://example.com`)
+* Add an option to read multiple URL's from a single file
 
 ## Version Notes
 ### 1.1
@@ -43,3 +44,4 @@ Alternatively, if you want to contribute to scrap-eo, it is recommended that you
 * Made output from meta commands more readable by using indentation 
 * Added ANSI colors to output
 * `--articles` option prints information about content encapsualted by the HTML5 `article` sectioning element
+* Improved how meta tags are searched for with the `--allmeta` option so that more meaningful data is returned
