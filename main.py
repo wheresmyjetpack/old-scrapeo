@@ -59,9 +59,13 @@ def cli(title, h1, allmeta, meta, articles, url):
 
     try:
         req = requests.get(url)
+        req.raise_for_status()    # Raise an exception if request returns "bad" status
 
-        # Raise an exception if request returns "bad" status
-        req.raise_for_status()
+    except requests.exceptions.RequestException, e:
+        # "Bad" status codes, improper input
+        handle_errors(e)
+
+    else:
         html = req.text
         scrapeo = ScrapEO(html)
 
@@ -128,7 +132,3 @@ def cli(title, h1, allmeta, meta, articles, url):
                     # paragraph in the content, where n = TRUNCATE_LENGTH
                     truncated_content = '%s...' % section['content'][0][:TRUNCATE_LENGTH]
                     click.echo('      %s: %s' % (CONTENT_STYLED, truncated_content))
-
-    except requests.exceptions.RequestException, e:
-        # "Bad" status codes, improper input
-        handle_errors(e)
