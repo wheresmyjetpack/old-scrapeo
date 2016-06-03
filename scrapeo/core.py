@@ -2,7 +2,7 @@ import requests
 import re
 import sys
 from collections import defaultdict
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, NavigableString
 
 class ScrapEO(object):
 
@@ -110,6 +110,41 @@ class ScrapEO(object):
 
         return articles
 
+    def outline(self, root=None):
+        root = root or self.soup.body
+        document_outline = []
+        content_sections = ['article', 'section']
+
+        if not root.name == 'html':
+            # Find the first node that contains an article - or - a section
+            parent = root.find_all(content_sections, limit=1)[0].parent
+
+            # TODO find the closest parent that has a next_sibling
+            next_node = self.__get_sibling_from(root) or self.__get_sibling_from(parent)
+            print 'THE NEXT NODE IS %s' % next_node
+
+            child_sections = parent.find_all(['article', 'section'], recursive=False)
+
+            # Then for each of the child sections, get the heading and content (if any)
+            for child in child_sections:
+                outlined_child = {}
+                outlined_child['type'] = child.name
+                outlined_child['heading'] = child.find(re.compile('h[1-6]'))
+                outlined_child['content'] = [paragraph for paragraph in child.find_all('p', recursive=False)]
+
+                # Then we want to see if there are sub-sections, and if so, recurse
+                if any(child.find_all(['article', 'section'], recursive=False)):
+                    outlined_child['sections'] = self.outline(root=child)
+
+                document_outline.append(outlined_child)
+
+            document_outline.extend(self.outline(root=next_node))
+
+        else:
+            pass
+
+        return document_outline
+
 
     """ Private methods """
 
@@ -134,3 +169,12 @@ class ScrapEO(object):
             pass
 
         return search_attr
+
+    def __get_sibling_from(self, node):
+        if not isinstance(node, NavigableString):
+            if not node.next_sibling:
+                self.__get_sibling_from(node.parent)
+            else:
+                return node.next_sibling
+        else:
+            return self.__get_sibling_from(node.next_sibling)
