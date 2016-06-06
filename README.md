@@ -14,12 +14,10 @@ With virtualenv installed on your system, you can follow the recommended steps b
 * `virtualenv ~/.virtualenvs/scrapeo`
 * `source ~/.virtualenvs/scrapeo/bin/activate`
 * `cd` into the cloned repo
-* `pip install .`
+* `pip install --editable .`
 * `deactivate`
 
 After running `pip install .`, an executable Python file will be generated in your *.virtualenvs/scrapeo/bin* directory called *scrapeo*. It is useful to create a symbolic link to this file in a directory that is listed for your path. For example `ln -s /home/<user>/.virtualenvs/scrapeo/bin/scrapeo /usr/local/bin/scrapeo` will allow you to run scrapeo from anywhere without having to type the full path to the executable (if */usr/local/bin/* is listed in your path environment variable).
-
-Alternatively, if you want to contribute to scrap-eo, it is recommended that you `pip install --editable .` so any changes you make to the source code take effect immediately. Otherwise, you must reinstall scrap-eo everytime you make changes.
 
 ## Planned Features
 * ~~Create an API for scrap-eo, moving the functions for scraping data to a separate file that contains a `ScrapEO` class~~
