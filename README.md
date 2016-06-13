@@ -29,6 +29,7 @@ After running `pip install .`, an executable Python file will be generated in yo
 * Setup a Makefile for easier installation
 * Move all existing options to their own commands (i.e., `scrapeo meta http://example.com` and `scrapeo title http://example.com`)
 * Add an option to read multiple URL's from a single file
+* Search case insensitively for the name / property / http-equiv attribute specified by the `--meta` option
 
 ## Version Notes
 ### 1.1
