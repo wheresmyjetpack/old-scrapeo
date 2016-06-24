@@ -111,32 +111,32 @@ class ScrapEO(object):
         return articles
 
     def outline(self, root=None):
-        root = root or self.soup.body
         document_outline = []
-        content_sections = ['article', 'section']
+        top_level_sections = []
+        section_types = ['article', 'section']
+        sections = self.soup.body.find_all(section_types)
 
-        if not root.name == 'html':
-            # Find the first node that contains an article - or - a section
-            parent = root.find_all(content_sections, limit=1)[0].parent
+        for s in sections:
+            section_parents = [p.name for p in s.parents]
+            # Are any parents of the section in our section_types list?
+            if not any(set(section_parents).intersection(section_types)):
+                top_level_sections.append(s)
 
-            # TODO find the closest parent that has a next_sibling
-            next_node = self.__get_sibling_from(root) or self.__get_sibling_from(parent)
-            print 'THE NEXT NODE IS %s' % next_node
-
-            child_sections = parent.find_all(['article', 'section'], recursive=False)
-
-            # Then for each of the child sections, get the heading and content (if any)
+        # Then for each of the child sections, get the heading and content (if any)
+        for sect in top_level_sections:
+            child_sections = sect.find_all(section_types)
+            child_sections = [child for child in child_sections if ]
             for child in child_sections:
                 outlined_child = {}
                 outlined_child['type'] = child.name
                 outlined_child['heading'] = child.find(re.compile('h[1-6]'))
                 outlined_child['content'] = [paragraph for paragraph in child.find_all('p', recursive=False)]
 
-                # Then we want to see if there are sub-sections, and if so, recurse
-                if any(child.find_all(['article', 'section'], recursive=False)):
-                    outlined_child['sections'] = self.outline(root=child)
+            # Then we want to see if there are sub-sections, and if so, recurse
+            if any(child.find_all(['article', 'section'], recursive=False)):
+                outlined_child['sections'] = self.outline(root=child)
 
-                document_outline.append(outlined_child)
+            document_outline.append(outlined_child)
 
             document_outline.extend(self.outline(root=next_node))
 
