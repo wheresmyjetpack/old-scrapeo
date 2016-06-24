@@ -114,21 +114,31 @@ def cli(title, h1, allmeta, meta, articles, url):
 
         # --articles option
         if articles:
-            scraped_articles = scrapeo.scrape_articles()
-            num_articles = click.style(str(len(scraped_articles)), fg='green')
+            outline = scrapeo.outline()
+            num_articles = click.style(str(len(outline)), fg='green')
 
             click.echo('\n%s article(s) found in the document' % num_articles)
 
-            for article in scraped_articles:
-                click.echo('  %s: %s' % (ARTICLE_STYLED, click.style(article['heading'], fg='green')))
+            print_sectioning_content(outline)
 
-                for section in article['sections']:
-                    try:
-                        click.echo('    %s: %s' % (SECTION_STYLED, click.style(section['heading'], fg='green')))
-                    except KeyError:
-                        click.echo('    %s: %s' % (SECTION_STYLED, click.style('NO HEADING', bg='blue')))
+def print_sectioning_content(outline):
 
-                    # Display the first n characters from the first
-                    # paragraph in the content, where n = TRUNCATE_LENGTH
-                    truncated_content = '%s...' % section['content'][0][:TRUNCATE_LENGTH]
-                    click.echo('      %s: %s' % (CONTENT_STYLED, truncated_content))
+    '''for sectioning_content in outline:
+        click.echo('  %s: %s' % (ARTICLE_STYLED, click.style(sectioning_content['heading'], fg='green')))
+
+        try:
+            click.echo('    %s: %s' % (SECTION_STYLED, click.style(sectioning_content['heading'], fg='green')))
+        except KeyError:
+            click.echo('    %s: %s' % (SECTION_STYLED, click.style('NO HEADING', bg='blue')))
+
+        # Display the first n characters from the first
+        # paragraph in the content, where n = TRUNCATE_LENGTH
+        try:
+            truncated_content = '%s...' % sectioning_content['content'][0][:TRUNCATE_LENGTH]
+        except IndexError:
+            truncated_content = 'NO CONTENT'
+        click.echo('      %s: %s' % (CONTENT_STYLED, truncated_content))
+
+        if any(sectioning_content['sections']):
+            print_sectioning_content(sectioning_content['sections'])'''
+    print outline

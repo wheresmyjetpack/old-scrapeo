@@ -110,43 +110,66 @@ class ScrapEO(object):
 
         return articles
 
-    def outline(self, root=None):
+    def outline(self):
+        top_level_sections = self.__get_top_level_sections()
+        return self.sort_content_sections(top_level_sections)
+
+    def sort_content_sections(self, top_level_sections):
         document_outline = []
-        top_level_sections = []
-        section_types = ['article', 'section']
-        sections = self.soup.body.find_all(section_types)
+        section_types = ['section', 'article']
 
-        for s in sections:
-            section_parents = [p.name for p in s.parents]
-            # Are any parents of the section in our section_types list?
-            if not any(set(section_parents).intersection(section_types)):
-                top_level_sections.append(s)
-
-        # Then for each of the child sections, get the heading and content (if any)
         for sect in top_level_sections:
-            child_sections = sect.find_all(section_types)
-            child_sections = [child for child in child_sections if ]
-            for child in child_sections:
-                outlined_child = {}
-                outlined_child['type'] = child.name
-                outlined_child['heading'] = child.find(re.compile('h[1-6]'))
-                outlined_child['content'] = [paragraph for paragraph in child.find_all('p', recursive=False)]
+            outlined_sect = {}
+            outlined_sect['type'] = sect.name
 
-            # Then we want to see if there are sub-sections, and if so, recurse
-            if any(child.find_all(['article', 'section'], recursive=False)):
-                outlined_child['sections'] = self.outline(root=child)
+            # get the section heading
+            sect_heading = sect.find(re.compile('h[1-6]'))
+            sect_content = sect.find_all('p')
+            sect_sub_sections = sect.find_all(section_types)
 
-            document_outline.append(outlined_child)
+            for parent in sect_heading.parents:
+                if parent == sect:
+                    outlined_sect['heading'] = sect_heading.text.encode('utf-8')
+                    break
+                elif parent.name in section_types:
+                    break
 
-            document_outline.extend(self.outline(root=next_node))
+            outlined_sect['content'] = []
+            for paragraph in sect_content:
+                for parent in paragraph.parents:
+                    if parent == sect:
+                        outlined_sect['content'].append(paragraph.text.encode('utf-8'))
+                        break
+                    elif parent.name in section_types:
+                        break
 
-        else:
-            pass
+            outlined_sect['sections'] = []
+            for sub_section in sect_sub_sections:
+                for parent in sub_section.parents:
+                    if parent == sect:
+                        outlined_sect['sections'].extend(self.sort_content_sections([sub_section]))
+                        break
+                    elif parent.name in section_types:
+                        break
+
+            document_outline.append(outlined_sect)
 
         return document_outline
 
 
     """ Private methods """
+
+    def __get_top_level_sections(self):
+        section_types = ['section', 'article']
+        top_level_sections = []
+        all_sections = self.soup.find_all(section_types)
+
+        for section in all_sections:
+            parent_names = [parent.name for parent in section.parents]
+            if not any(set(parent_names).intersection(section_types)):
+                top_level_sections.append(section)
+
+        return top_level_sections
 
     def __get_search_attr(self, tag):
 
