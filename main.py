@@ -118,27 +118,24 @@ def cli(title, h1, allmeta, meta, articles, url):
             num_articles = click.style(str(len(outline)), fg='green')
 
             click.echo('\n%s article(s) found in the document' % num_articles)
-
             print_sectioning_content(outline)
 
-def print_sectioning_content(outline):
+def print_sectioning_content(outline, spacing=""):
 
-    '''for sectioning_content in outline:
-        click.echo('  %s: %s' % (ARTICLE_STYLED, click.style(sectioning_content['heading'], fg='green')))
+    for section in outline:
+        click.echo('%sType: %s' % (spacing, section['type']))
 
         try:
-            click.echo('    %s: %s' % (SECTION_STYLED, click.style(sectioning_content['heading'], fg='green')))
+            click.echo('%sHeading: %s' % (spacing, section['heading']))
         except KeyError:
-            click.echo('    %s: %s' % (SECTION_STYLED, click.style('NO HEADING', bg='blue')))
+            # No heading for this section
+            click.echo('%sHeading: NONE' % spacing)
 
-        # Display the first n characters from the first
-        # paragraph in the content, where n = TRUNCATE_LENGTH
-        try:
-            truncated_content = '%s...' % sectioning_content['content'][0][:TRUNCATE_LENGTH]
-        except IndexError:
-            truncated_content = 'NO CONTENT'
-        click.echo('      %s: %s' % (CONTENT_STYLED, truncated_content))
+        for content in section['content']:
+            click.echo('%sContent: %s' % (spacing, content))
 
-        if any(sectioning_content['sections']):
-            print_sectioning_content(sectioning_content['sections'])'''
-    print outline
+        if any(section['sections']):
+            click.echo('%sSub-sections:' % spacing)
+            indent = spacing + "  "
+            print_sectioning_content(section['sections'], spacing=indent)
+            click.echo('\n')

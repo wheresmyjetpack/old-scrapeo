@@ -127,12 +127,17 @@ class ScrapEO(object):
             sect_content = sect.find_all('p')
             sect_sub_sections = sect.find_all(section_types)
 
-            for parent in sect_heading.parents:
-                if parent == sect:
-                    outlined_sect['heading'] = sect_heading.text.encode('utf-8')
-                    break
-                elif parent.name in section_types:
-                    break
+            try:
+                for parent in sect_heading.parents:
+                    if parent == sect:
+                        outlined_sect['heading'] = sect_heading.text.encode('utf-8')
+                        break
+                    elif parent.name in section_types:
+                        break
+
+            except AttributeError, e:
+                # Section has no heading
+                pass
 
             outlined_sect['content'] = []
             for paragraph in sect_content:
