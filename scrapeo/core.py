@@ -70,46 +70,6 @@ class ScrapEO(object):
         # Returns a list of all h1's in the document
         return [h1.text.encode('utf-8').strip() for h1 in self.soup.find_all('h1')]
 
-    def scrape_articles(self):
-        # TODO This really should be more of a document
-        # outline generator, since it's becoming clear
-        # that this method will handle more than just specifically
-        # articles
-
-        # Returns a list of articles
-        # Each article is a dictionary which may contain
-        # 'heading' and 'content' keys
-        articles = []
-
-        for article in self.soup.find_all('article'):
-            article_data = {}
-
-            # The first h tag in the article is the
-            # article heading
-            article_data['heading'] = article.find(re.compile('h[1-6]')).text.encode('utf-8').strip()
-            article_data['sections'] = []
-
-            for section in article.find_all('section'):
-                section_data = {}
-                try:
-                    # The first h tag in the section is the 
-                    # section heading
-                    section_data['heading'] = section.find(re.compile('h[1-6]')).text.encode('utf-8').strip()
-
-                except AttributeError:
-                    # Section does not contain a heading
-                    # Do not create a 'heading' key so we can raise
-                    # another AttributeError later when accessing
-                    # values in the articles list
-                    pass
-
-                section_data['content'] = [paragraph.text.encode('utf-8') for paragraph in section.find_all('p')]
-                article_data['sections'].append(section_data)
-
-            articles.append(article_data)
-
-        return articles
-
     def outline(self):
         top_level_sections = self.__get_top_level_sections()
         return self.sort_content_sections(top_level_sections)
@@ -197,12 +157,3 @@ class ScrapEO(object):
             pass
 
         return search_attr
-
-    def __get_sibling_from(self, node):
-        if not isinstance(node, NavigableString):
-            if not node.next_sibling:
-                self.__get_sibling_from(node.parent)
-            else:
-                return node.next_sibling
-        else:
-            return self.__get_sibling_from(node.next_sibling)
