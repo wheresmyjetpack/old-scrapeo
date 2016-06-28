@@ -35,8 +35,9 @@ H1_STYLED = click.style('h1\'s', fg='green')
 TITLE_STYLED = click.style('Title', fg='green')
 META_STYLED = click.style('Meta', fg='green')
 ARTICLE_STYLED = click.style('Article', fg='yellow')
-SECTION_STYLED = click.style('Section', fg='yellow')
+SECTION_STYLED = click.style('Sub-sections', fg='yellow')
 CONTENT_STYLED = click.style('Content', fg='yellow')
+HEADING_STYLED = click.style('Heading', fg='yellow')
 
 @click.command()
 @click.option('--title', '-t', is_flag='true',
@@ -123,19 +124,18 @@ def cli(title, h1, allmeta, meta, articles, url):
 def print_sectioning_content(outline, spacing=""):
 
     for section in outline:
-        click.echo('%sType: %s' % (spacing, section['type']))
+        click.echo('\n%s%s: %s' % (spacing, click.style('Type', fg='yellow'), section['type']))
 
         try:
-            click.echo('%sHeading: %s' % (spacing, section['heading']))
+            click.echo('%s%s: %s' % (spacing, HEADING_STYLED, section['heading']))
         except KeyError:
             # No heading for this section
-            click.echo('%sHeading: NONE' % spacing)
+            click.echo('%s%s: NONE' % (spacing, HEADING_STYLED))
 
         for content in section['content']:
-            click.echo('%sContent: %s' % (spacing, content))
+            click.echo('%s%s: %s' % (spacing, CONTENT_STYLED, content))
 
         if any(section['sections']):
-            click.echo('%sSub-sections:' % spacing)
+            click.echo('%s%s:' % (spacing, SECTION_STYLED))
             indent = spacing + "  "
             print_sectioning_content(section['sections'], spacing=indent)
-            click.echo('\n')
