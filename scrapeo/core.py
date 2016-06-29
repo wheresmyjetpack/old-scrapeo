@@ -90,7 +90,7 @@ class ScrapEO(object):
             try:
                 for parent in sect_heading.parents:
                     if parent == sect:
-                        outlined_sect['heading'] = sect_heading.text.encode('utf-8')
+                        outlined_sect['heading'] = sect_heading.text.encode('utf-8').strip()
                         break
                     elif parent.name in section_types:
                         break
