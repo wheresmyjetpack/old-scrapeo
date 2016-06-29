@@ -35,24 +35,24 @@ H1_STYLED = click.style('h1\'s', fg='green')
 TITLE_STYLED = click.style('Title', fg='green')
 META_STYLED = click.style('Meta', fg='green')
 ARTICLE_STYLED = click.style('Article', fg='yellow')
-SECTION_STYLED = click.style('Sub-sections', fg='yellow')
-CONTENT_STYLED = click.style('Content', fg='yellow')
+SECTION_STYLED = click.style('Sub-sections', bg='blue')
+CONTENT_STYLED = click.style('Content', fg='green')
 HEADING_STYLED = click.style('Heading', fg='yellow')
 
 @click.command()
 @click.option('--title', '-t', is_flag='true',
         help='Tell scrapeo to print the title of the document')
-@click.option('--h1', is_flag='true',
+@click.option('--h1', '-h', is_flag='true',
         help='Tell scrapeo to print the text node for all h1\'s in the document')
 @click.option('--allmeta', '-a', is_flag='true',
         help='Tell scrapeo to print the content (if it exists) from all self-closing meta tags')
-@click.option('--articles', '-r', is_flag='true',
-        help='Tell scrapeo to print any articles on the page')
+@click.option('--sections', '-s', is_flag='true',
+        help='(HTML5 Spec ONLY) Tell scrapeo to print out information and content for all sectioning content elements in the document')
 @click.option('--meta', '-m',
         multiple=True,
         help='Search meta tags by name and print their content')
 @click.argument('url')
-def cli(title, h1, allmeta, meta, articles, url):
+def cli(title, h1, allmeta, meta, sections, url):
     """ Scrape data from a document found at URL for SEO data analysis """
 
     # Rebuild URL if schema is not provided
@@ -71,7 +71,7 @@ def cli(title, h1, allmeta, meta, articles, url):
         scrapeo = ScrapEO(html)
 
         # Run without options provided (default behavior)
-        if not any([title, allmeta, meta, h1, articles]):
+        if not any([title, allmeta, meta, h1, sections]):
             scraped_meta = scrapeo.scrape_meta(DEFAULT_META)
             click.echo('%s: %s' % (TITLE_STYLED, scrapeo.scrape_title()))
             click.echo('%s' % META_STYLED)
@@ -113,12 +113,12 @@ def cli(title, h1, allmeta, meta, articles, url):
             click.echo('\n%s:' % META_STYLED)
             echo_meta(scraped_meta)
 
-        # --articles option
-        if articles:
+        # --sections option
+        if sections:
             outline = scrapeo.outline()
-            num_articles = click.style(str(len(outline)), fg='green')
+            num_sections = click.style(str(len(outline)), fg='green')
 
-            click.echo('\n%s article(s) found in the document' % num_articles)
+            click.echo('\n%s top level sectioning content element(s) found in the document' % num_sections)
             print_sectioning_content(outline)
 
 def print_sectioning_content(outline, spacing=""):
