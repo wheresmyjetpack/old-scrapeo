@@ -103,7 +103,7 @@ class ScrapEO(object):
             for paragraph in sect_content:
                 for parent in paragraph.parents:
                     if parent == sect:
-                        outlined_sect['content'].append(paragraph.text.encode('utf-8'))
+                        outlined_sect['content'].append(paragraph.text.encode('utf-8').strip())
                         break
                     elif parent.name in section_types:
                         break
