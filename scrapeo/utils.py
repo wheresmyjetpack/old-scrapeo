@@ -31,7 +31,11 @@ def rebuild_url(url):
 def handle_errors(e):
     if isinstance(e, requests.exceptions.ConnectionError):
         echo(style('CONNECION ERROR', bg='red'))
-        echo('%s Possible DNS failure, the connection may have been refused by the host, or the host may be down' % NEG_INDICATOR)
+        if isinstance(e, requests.exceptions.SSLError):
+            echo('%s %s' % (NEG_INDICATOR, e.args[0]))
+
+        else:
+            echo('%s Possible DNS failure, the connection may have been refused by the host, or the host may be down' % NEG_INDICATOR)
 
     if isinstance(e, requests.exceptions.HTTPError):
         echo(style('HTTP ERROR', bg='red'))
